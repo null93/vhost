@@ -13,19 +13,3 @@ vhost create lemp m1.howtospeedupmagento.com application=magento-1 with-varnish=
 vhost create lemp wp.howtospeedupmagento.com application=wordpress with-varnish=no php-version=8.0
 nginx -s reload
 ```
-
-### Possible Future Commands
-
-```
-vhost create TEMPLATE DOMAIN application=magento-1 php-version=7.2
-vhost delete DOMAIN
-vhost upgrade DOMAIN application=magento-1 php-version=8.0
-vhost modify DOMAIN php-version=8.0
-vhost enable DOMAIN
-vhost disable DOMAIN
-vhost list
-vhost info DOMAIN
-
-vhost template list
-vhost template info TEMPLATE
-```
