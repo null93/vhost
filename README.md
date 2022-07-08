@@ -4,8 +4,8 @@
 ### Try It Out
 
 ```
-docker-compose up -d
 rm ./conf/nginx/sites-*/*.conf
+docker-compose up -d
 docker-compose exec nginx bash
 vhost create catch-all default.localhost
 vhost create lemp m2.howtospeedupmagento.com application=magento-2
