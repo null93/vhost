@@ -1,0 +1,18 @@
+version: "3"
+
+services:
+  nginx:
+    image: "nginx:latest"
+    volumes:
+      - ./conf/nginx/conf.d:/etc/nginx/conf.d
+      - ./conf/nginx/sites-available:/etc/nginx/sites-available
+      - ./conf/nginx/sites-enabled:/etc/nginx/sites-enabled
+      - ./conf/nginx/nginx.conf:/etc/nginx/nginx.conf
+      - ./bin:/usr/local/bin
+    ports:
+      - "80:80"
+      - "443:443"
+  varnish:
+    image: "varnish:latest"
+    volumes:
+      - ./conf/varnish/default.vcl:/etc/varnish/default.vcl

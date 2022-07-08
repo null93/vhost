@@ -1,0 +1,6 @@
+# Files
+.DS_Store
+
+# Directories
+conf/nginx/sites-available/*.conf
+conf/nginx/sites-enabled/*.conf
