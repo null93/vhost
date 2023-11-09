@@ -1,15 +1,43 @@
 # Proposal — NGINX
+
 > NGINX config structure for provisioning virtual hosts with a CLI tool
+
+### Requirements
+
+All you need is docker installed with the docker compose plugin.
 
 ### Try It Out
 
+On your host machine, run the following commands:
+
 ```
-rm ./conf/nginx/sites-*/*.conf
 docker-compose up -d
 docker-compose exec nginx bash
-vhost create catch-all default.localhost
-vhost create lemp m2.howtospeedupmagento.com application=magento-2
-vhost create lemp m1.howtospeedupmagento.com application=magento-1 with-varnish=no
-vhost create lemp wp.howtospeedupmagento.com application=wordpress with-varnish=no php-version=8.0
+```
+
+Once you are inside the docker container, you can create some virtual hosts:
+
+```
+vhost create catch-all default-backend
+vhost enable default-backend
+
+vhost create wordpress my-blog domain_names=wordpress-127-0-0-1.nip.io
+vhost enable my-blog
+
+vhost create magento-2 my-store magento_version=2.4.6.3 domain_names=magento-127-0-0-1.nip.io
+vhost enable my-store
+```
+
+Finally you can reload nginx to apply the changes:
+
+```
 nginx -s reload
+```
+
+That's it! You can now visit the following URLs:
+
+```
+http://localhost
+http://wordpress-127-0-0-1.nip.io
+http://magento-127-0-0-1.nip.io
 ```

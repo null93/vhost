@@ -2,42 +2,67 @@ package internal
 
 import (
 	"fmt"
-	"os"
 
-	. "github.com/jetrails/jrctl/pkg/output"
-	"github.com/jetrails/proposal-nginx/sdk/vhost"
+	"github.com/jetrails/proposal-nginx/pkg/utils"
+	"github.com/jetrails/proposal-nginx/pkg/vhost"
 	"github.com/spf13/cobra"
 )
 
-func dereference (ptr * string) string {
-	if ptr == nil {
-		return ""
-	}
-	return *ptr
-}
-
 var templateInfoCmd = &cobra.Command{
-	Use:     "info",
-	Short:   "show template details",
-	Args:    cobra.ExactArgs(1),
+	Use:   "info TEMPLATE_NAME",
+	Short: "show template details",
+	Args:  cobra.ExactArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
 		templateName := args[0]
-		if template, err := vhost.LoadTemplate (templateName); err == nil {
-			tbl := NewTable(Columns{"Parameter","Default Value", "Validation", "Description"})
-			for key, schema := range template.Schema {
-				tbl.AddRow (Columns{
-					key,
-					dereference(schema.Value),
-					dereference(schema.Pattern),
-					dereference(schema.Description),
-				})
+		if template, err := vhost.LoadTemplate(templateName); err == nil {
+			tbl1 := utils.NewTable("Parameter", "Default Value", "Validation", "Custom Validation", "Description")
+			tbl1.AddRow(
+				"site_name",
+				"<injected>",
+				"-",
+				"-",
+				"Name of your site",
+			)
+			inputSchemaKeys := template.InputSchema.SortedKeys()
+			for _, key := range inputSchemaKeys {
+				schema := template.InputSchema[key]
+				if !schema.ProvisionerOnly {
+					tbl1.AddRow(
+						key,
+						schema.Value,
+						schema.Pattern,
+						schema.CustomPattern,
+						schema.Description,
+					)
+				}
 			}
-			fmt.Println()
-			tbl.PrintTable()
-			fmt.Println()
+			tbl1.PrintSeparator()
+			fmt.Println("# Template Values")
+			fmt.Println("# These values are saved within the checkpoint and can be modified after creation by the user.")
+			tbl1.PrintSeparator()
+			tbl1.Print()
+			tbl1.PrintSeparator()
+
+			tbl2 := utils.NewTable("Parameter", "Default Value", "Validation", "Custom Validation", "Description")
+			for _, key := range inputSchemaKeys {
+				schema := template.InputSchema[key]
+				if schema.ProvisionerOnly {
+					tbl2.AddRow(
+						key,
+						schema.Value,
+						schema.Pattern,
+						schema.CustomPattern,
+						schema.Description,
+					)
+				}
+			}
+			fmt.Println("# Provisioner Inputs")
+			fmt.Println("# These inputs are used only by the provisioner during creation and are not saved within the checkpoint.")
+			tbl2.PrintSeparator()
+			tbl2.Print()
+			tbl2.PrintSeparator()
 		} else {
-			fmt.Printf ("\nError: could not find template with name %q\n\n", templateName)
-			os.Exit (1)
+			ExitWithError(1, fmt.Sprintf("could not find template with name %q", templateName))
 		}
 	},
 }

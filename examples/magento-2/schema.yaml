@@ -1,0 +1,14 @@
+domain_names:
+  description: Domain names
+  pattern: domain
+  value: "_"
+download:
+  description: Should provisioner download magento?
+  pattern: yes-no
+  value: yes
+  provisioner_only: true
+magento_version:
+  description: Magento version
+  custom_pattern: ^2(\.\d{1,2}){2,3}$
+  value: ""
+  provisioner_only: true

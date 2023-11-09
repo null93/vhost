@@ -2,5 +2,8 @@
 .DS_Store
 
 # Directories
+bin
+dist
+private
 conf/nginx/sites-available/*.conf
 conf/nginx/sites-enabled/*.conf

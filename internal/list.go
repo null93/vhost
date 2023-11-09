@@ -1,34 +1,35 @@
 package internal
 
 import (
-	"fmt"
-
-	. "github.com/jetrails/jrctl/pkg/output"
-	"github.com/jetrails/proposal-nginx/sdk/vhost"
+	"github.com/jetrails/proposal-nginx/pkg/utils"
+	"github.com/jetrails/proposal-nginx/pkg/vhost"
 	"github.com/spf13/cobra"
 )
 
 var listCmd = &cobra.Command{
-	Use:     "list DOMAIN",
-	Short:   "list all configured vhosts",
-	Args:    cobra.ExactArgs(0),
+	Use:   "list DOMAIN",
+	Short: "list all configured vhosts",
+	Args:  cobra.ExactArgs(0),
 	Run: func(cmd *cobra.Command, args []string) {
-		tbl := NewTable(Columns{
-			"Domain Name",
-			"Template Name",
-			"Enabled",
-		})
-		enabledMap := map[bool]string{true: "enabled", false: "disabled"}
-		for _, status := range vhost.List() {
-			tbl.AddRow(Columns{
-				status.VirtualHost.Name,
-				status.VirtualHost.Template.Name,
-				enabledMap[status.Enabled],
-			})
+		tbl := utils.NewTable(
+			"Site Name",
+			"Status",
+			"Template",
+		)
+		sites, errList := vhost.GetSites()
+		if errList != nil {
+			ExitWithError(1, errList.Error())
 		}
-		fmt.Println()
-		tbl.PrintTable()
-		fmt.Println()
+		for _, site := range sites {
+			tbl.AddRow(
+				site.Name,
+				string(site.State),
+				site.LatestCheckPoint.Template.Name+" ("+site.LatestCheckPoint.Template.Hash()+")",
+			)
+		}
+		tbl.PrintSeparator()
+		tbl.Print()
+		tbl.PrintSeparator()
 	},
 }
 

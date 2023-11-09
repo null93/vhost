@@ -1,0 +1,26 @@
+---
+
+# Documentation:
+# https://nfpm.goreleaser.com/configuration/
+
+name: vhost
+arch: arm64
+platform: linux
+version: 0.0.1
+section: default
+priority: extra
+maintainer: Rafael Grigorian <development@jetrails.com>
+description: CLI tool for managing NGINX virtual hosts
+vendor: JetRails
+homepage: https://github.com/jetrails/vhost
+contents:
+  - src: bin/vhost
+    dst: /usr/bin/vhost
+  - src: examples
+    dst: /var/lib/vhost/templates
+  - type: dir
+    dst: /var/lib/vhost/checkpoints
+  - type: dir
+    dst: /etc/vhost
+depends:
+  - bash-completion

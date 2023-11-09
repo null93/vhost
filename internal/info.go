@@ -1,38 +1,36 @@
 package internal
 
 import (
-	"fmt"
-	"os"
+	"github.com/jetrails/proposal-nginx/pkg/utils"
 
-	. "github.com/jetrails/jrctl/pkg/output"
-
-	"github.com/jetrails/proposal-nginx/sdk/vhost"
+	"github.com/jetrails/proposal-nginx/pkg/vhost"
 	"github.com/spf13/cobra"
 )
 
 var infoCmd = &cobra.Command{
-	Use:     "info DOMAIN",
-	Short:   "info a vhost given the domain name",
-	Args:    cobra.ExactArgs(1),
+	Use:   "info SITE_NAME",
+	Short: "show info about a site",
+	Args:  cobra.ExactArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
-		domainName := args[0]
-
-		if status := vhost.Info(domainName); status != nil {
-			tbl := NewTable(Columns{" "," "})
-			enabledMap := map[bool]string{true: "enabled", false: "disabled"}
-			hash := status.VirtualHost.Template.Hash ()
-			tbl.AddRow(Columns{"enabled:", enabledMap[status.Enabled]})
-			tbl.AddRow(Columns{"template-hash:", hash[:8] + "..." + hash[len(hash)-8:]})
-			for key, value := range status.VirtualHost.Input {
-				tbl.AddRow(Columns{key + ":", value})
-			}
-			tbl.PrintTable()
-			fmt.Println()
-		} else {
-			fmt.Printf ("\nError: could not find config with name %q\n\n", domainName)
-			os.Exit (1)
+		siteName := args[0]
+		if !vhost.SiteExists(siteName) {
+			ExitWithError(1, "site does not exist")
 		}
-
+		site, errSite := vhost.GetSite(siteName)
+		if errSite != nil {
+			ExitWithError(2, errSite.Error())
+		}
+		tbl := utils.NewTable("Key", "Value")
+		tbl.AddRow("state:", string(site.State))
+		tbl.AddRow("template_hash:", site.LatestCheckPoint.Template.Hash())
+		tbl.AddRow("input_hash:", site.LatestCheckPoint.Input.Hash())
+		tbl.AddRow("output_hash:", site.LatestCheckPoint.Output.Hash())
+		for key, value := range site.LatestCheckPoint.Input {
+			tbl.AddRow(key+":", value)
+		}
+		tbl.PrintSeparator()
+		tbl.Print()
+		tbl.PrintSeparator()
 	},
 }
 

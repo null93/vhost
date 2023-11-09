@@ -1,22 +1,23 @@
 package internal
 
 import (
-	"fmt"
-	"os"
-
-	"github.com/jetrails/proposal-nginx/sdk/vhost"
+	"github.com/jetrails/proposal-nginx/pkg/vhost"
 	"github.com/spf13/cobra"
 )
 
 var enableCmd = &cobra.Command{
-	Use:     "enable DOMAIN",
-	Short:   "enable a vhost given the domain name",
-	Args:    cobra.ExactArgs(1),
+	Use:   "enable SITE_NAME",
+	Short: "enable a site by name",
+	Args:  cobra.ExactArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
-		domainName := args[0]
-		if err := vhost.Enable(domainName); err != nil {
-			fmt.Printf("\nError: %s\n\n", err.Error())
-			os.Exit(1)
+		siteName := args[0]
+
+		if !vhost.SiteExists(siteName) {
+			ExitWithError(1, "site does not exist")
+		}
+
+		if err := vhost.EnableSite(siteName); err != nil {
+			ExitWithError(2, "failed to enable site")
 		}
 	},
 }

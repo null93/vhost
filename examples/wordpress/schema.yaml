@@ -1,0 +1,4 @@
+domain_names:
+  description: Domain names
+  pattern: domain
+  value: "_"

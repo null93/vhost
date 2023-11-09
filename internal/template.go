@@ -5,8 +5,8 @@ import (
 )
 
 var templateCmd = &cobra.Command{
-	Use:     "template",
-	Short:   "explore available templates",
+	Use:   "template",
+	Short: "explore available templates",
 }
 
 func init() {
