@@ -1,4 +1,4 @@
-# Proposal — NGINX
+# NGINX — vhost
 
 > NGINX config structure for provisioning virtual hosts with a CLI tool
 
