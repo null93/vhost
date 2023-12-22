@@ -2,6 +2,12 @@
 
 > NGINX config structure for provisioning virtual hosts with a CLI tool
 
+### About
+
+This is a proposal for a new NGINX config structure that allows for provisioning virtual hosts with a CLI tool.
+Please keep in mind that this is a proof of concept and the actual config files in the example nginx config directory are not complete.
+It is the minimum viable product to demonstrate the CLI tool rather than a complete NGINX config.
+
 ### Requirements
 
 All you need is docker installed with the docker compose plugin.
