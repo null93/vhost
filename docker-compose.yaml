@@ -2,11 +2,11 @@ version: "3"
 
 services:
   build:
-    image: golang:1.20-alpine
+    image: golang:1.21-alpine
     working_dir: /usr/src/app
     volumes:
       - .:/usr/src/app
-    command: sh -c "apk --no-cache --quiet add make && make tools deps package && touch /tmp/healthy"
+    command: sh -c "apk --no-cache --quiet add git make && make tools deps package && touch /tmp/healthy"
     healthcheck:
       test: ["CMD-SHELL", "cat", "/tmp/healthy"]
       interval: 10s

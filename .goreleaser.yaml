@@ -38,6 +38,13 @@ nfpms:
     maintainer: Rafael Grigorian <rafael@grigorian.org>
     vendor: null93
     bindir: /usr/bin
+    contents:
+    - src: examples
+      dst: /var/lib/vhost/templates
+    - type: dir
+      dst: /var/lib/vhost/checkpoints
+    - type: dir
+      dst: /etc/vhost
     section: utils
     formats:
       - apk

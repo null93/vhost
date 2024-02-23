@@ -3,7 +3,7 @@
 
 tools:
 	@echo "Installing tools..."
-	command -v nfpm || go install github.com/goreleaser/nfpm/v2/cmd/nfpm@latest
+	command -v goreleaser || go install github.com/goreleaser/goreleaser@latest
 	command -v goimports || go install golang.org/x/tools/cmd/goimports@latest
 
 deps:
@@ -12,7 +12,7 @@ deps:
 
 build:
 	@echo "Building for your arch..."
-	GOOS=linux go build -ldflags="-s -w" -trimpath -o bin/vhost cmd/vhost/main.go
+	goreleaser build --snapshot --clean
 	
 test:
 	@echo "Running tests..."
@@ -29,5 +29,4 @@ pretty: tools
 
 package: clean pretty build
 	@echo "Packaging for your arch..."
-	mkdir -p dist
-	nfpm pkg --target dist/vhost_0.0.1_linux_arm64.deb
+	goreleaser release --clean
