@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/jetrails/proposal-nginx/pkg/vhost"
+	"github.com/null93/vhost/pkg/vhost"
 	"github.com/spf13/cobra"
 )
 

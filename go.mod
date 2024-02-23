@@ -1,4 +1,4 @@
-module github.com/jetrails/proposal-nginx
+module github.com/null93/vhost
 
 go 1.17
 

@@ -1,7 +1,7 @@
 package main
 
 import (
-	"github.com/jetrails/proposal-nginx/internal"
+	"github.com/null93/vhost/internal"
 )
 
 func main() {

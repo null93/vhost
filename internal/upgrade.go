@@ -8,7 +8,7 @@ import (
 	"github.com/hexops/gotextdiff"
 	"github.com/hexops/gotextdiff/myers"
 	"github.com/hexops/gotextdiff/span"
-	"github.com/jetrails/proposal-nginx/pkg/vhost"
+	"github.com/null93/vhost/pkg/vhost"
 	"github.com/spf13/cobra"
 )
 
