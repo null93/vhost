@@ -10,6 +10,10 @@ import (
 	"github.com/spf13/viper"
 )
 
+const (
+	Version = "0.0.1"
+)
+
 func ParseKeyValueArgs(args []string) vhost.TemplateInput {
 	mapping := vhost.TemplateInput{}
 	for _, arg := range args {
@@ -49,7 +53,7 @@ func ExitWithError(code int, message string) {
 
 var RootCmd = &cobra.Command{
 	Use:     "vhost",
-	Version: "0.0.1",
+	Version: Version,
 	Short:   "manage nginx virtual hosts",
 }
 
