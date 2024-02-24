@@ -10,7 +10,7 @@ import (
 	"github.com/spf13/viper"
 )
 
-const (
+var (
 	Version = "0.0.0"
 )
 
