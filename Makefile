@@ -30,3 +30,7 @@ pretty: tools
 package: clean pretty build
 	@echo "Packaging for your arch..."
 	goreleaser release --clean
+
+package-snapshot: clean pretty build
+	@echo "Packaging for your arch..."
+	goreleaser release --clean --snapshot
