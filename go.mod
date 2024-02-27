@@ -1,6 +1,6 @@
 module github.com/null93/vhost
 
-go 1.17
+go 1.21
 
 require (
 	github.com/hexops/gotextdiff v1.0.3
