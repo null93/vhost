@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"regexp"
+	"slices"
 	"sort"
 
 	"gopkg.in/yaml.v3"
@@ -12,11 +13,12 @@ import (
 type InputSchema map[string]Definition
 
 type Definition struct {
-	Pattern         string `yaml:"pattern"`
-	CustomPattern   string `yaml:"custom_pattern"`
-	Description     string `yaml:"description"`
-	Value           string `yaml:"value"`
-	ProvisionerOnly bool   `yaml:"provisioner_only"`
+	Pattern         string   `yaml:"pattern"`
+	CustomPattern   string   `yaml:"custom_pattern"`
+	Description     string   `yaml:"description"`
+	Value           string   `yaml:"value"`
+	ProvisionerOnly bool     `yaml:"provisioner_only"`
+	AllowedValues   []string `yaml:"allowed_values"`
 }
 
 var Patterns = map[string]string{
@@ -95,7 +97,8 @@ func (schema InputSchema) Validate(input TemplateInput) (TemplateInput, error) {
 			value = input[key]
 		}
 		re := regexp.MustCompile(pattern)
-		if !re.MatchString(value) {
+		isAllowedValue := slices.ContainsFunc(definition.AllowedValues, func(v string) bool { return v == value })
+		if !isAllowedValue && !re.MatchString(value) {
 			return TemplateInput{}, fmt.Errorf("invalid value for input %q", key)
 		}
 		validated[key] = value

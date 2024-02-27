@@ -28,6 +28,10 @@ func TestParsing(t *testing.T) {
 	if errReserved != ErrReservedKey {
 		t.Fatal(errReserved)
 	}
+	_, errAllowedValuesValid := ParseInputSchema([]byte(`foo: { pattern: "yes-no", allowed_values: ["maybe"] }`))
+	if errAllowedValuesValid != nil {
+		t.Fatal(errAllowedValuesValid)
+	}
 }
 
 func TestValidation(t *testing.T) {
