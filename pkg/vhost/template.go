@@ -276,7 +276,10 @@ func (t Template) RunProvisioner(siteName string, input TemplateInput) error {
 		return errWrite
 	}
 	cmd := exec.Command(provisionerPath)
-	cmd.Env = []string{"HOME="+os.Getenv("HOME")}
+	cmd.Env = []string{
+		"HOME="+os.Getenv("HOME"),
+		"PATH="+os.Getenv("PATH"),
+	}
 	cmd.Env = append(cmd.Env, validatedInput.GetEnvironmentalVars()...)
 	cmd.Dir = tmpDir
 	cmd.Stdout = os.Stdout
