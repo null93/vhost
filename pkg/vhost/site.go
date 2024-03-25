@@ -89,22 +89,17 @@ func SiteExists(siteName string) bool {
 }
 
 func DeleteSite(siteName string, silent bool) error {
-	if err := os.Remove(path.Join(PATH_NGINX_AVAILABLE_DIR, siteName+".conf")); err != nil {
-		if !silent {
-			return err
-		}
-	}
-	if err := os.Remove(path.Join(PATH_NGINX_ENABLED_DIR, siteName+".conf")); err != nil {
-		if !silent {
-			return err
-		}
-	}
 	latestCheckPoint, errLatest := GetLatestCheckPoint(siteName)
 	if errLatest != nil {
 		return errLatest
 	}
 	if err := latestCheckPoint.Output.DeleteFiles(silent); !silent && err != nil {
 		return err
+	}
+	if err := os.Remove(path.Join(PATH_NGINX_ENABLED_DIR, siteName+".conf")); err != nil {
+		if !silent {
+			return err
+		}
 	}
 	return nil
 }

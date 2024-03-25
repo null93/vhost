@@ -31,16 +31,20 @@ var upgradeCmd = &cobra.Command{
 			ExitWithError(2, errCheckPoint.Error())
 		}
 
+		if !checkPoint.Template.Exists() {
+			ExitWithError(3, "site is not managed by vhost")
+		}
+
 		latestTemplate, errTemplate := vhost.LoadTemplate(checkPoint.Template.Name)
 		if errTemplate != nil {
-			ExitWithError(3, errTemplate.Error())
+			ExitWithError(4, errTemplate.Error())
 		}
 
 		mergedInput := MergeInput(checkPoint.Input, templateInput)
 
 		newCheckPoint, errNewCheckPoint := vhost.NewCheckPoint(siteName, latestTemplate, mergedInput)
 		if errNewCheckPoint != nil {
-			ExitWithError(4, errNewCheckPoint.Error())
+			ExitWithError(5, errNewCheckPoint.Error())
 		}
 
 		if dryRun {
@@ -59,7 +63,7 @@ var upgradeCmd = &cobra.Command{
 				fullDiff = fullDiff + diff
 			}
 			if len(fullDiff) > 0 {
-				ExitWithError(5, "site deviates from template in checkpoint, rollback first")
+				ExitWithError(6, "site deviates from template in checkpoint, rollback first")
 			}
 			for fileName, fileBytes := range newCheckPoint.Output {
 				delete(seen, fileName)

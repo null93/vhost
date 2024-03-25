@@ -34,6 +34,10 @@ var diffCmd = &cobra.Command{
 
 		checkPoint := checkPoints[len(checkPoints)-1]
 
+		if !checkPoint.Template.Exists() {
+			ExitWithError(4, "site is not managed by vhost")
+		}
+
 		for fileName, fileBytes := range checkPoint.Output {
 			currentPath := fmt.Sprintf("%s/%s", vhost.PATH_NGINX_DIR, fileName)
 			templatePath := fmt.Sprintf("%s/%s", checkPoint.GetFileName(), fileName)

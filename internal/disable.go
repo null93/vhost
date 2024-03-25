@@ -18,8 +18,17 @@ var disableCmd = &cobra.Command{
 			ExitWithError(1, fmt.Sprintf("site %q does not exist", siteName))
 		}
 
+		latestCheckPoint, errLatest := vhost.GetLatestCheckPoint(siteName)
+		if errLatest != nil {
+			ExitWithError(2, errLatest.Error())
+		}
+
+		if !latestCheckPoint.Template.Exists() {
+			ExitWithError(3, "site is not managed by vhost")
+		}
+
 		if err := vhost.DisableSite(siteName); err != nil {
-			ExitWithError(2, "failed to disable site")
+			ExitWithError(4, "failed to disable site")
 		}
 	},
 }

@@ -1,6 +1,8 @@
 package internal
 
 import (
+	"fmt"
+
 	"github.com/null93/vhost/pkg/utils"
 	"github.com/null93/vhost/pkg/vhost"
 	"github.com/spf13/cobra"
@@ -21,10 +23,14 @@ var listCmd = &cobra.Command{
 			ExitWithError(1, errList.Error())
 		}
 		for _, site := range sites {
+			template := "<manual>"
+			if site.LatestCheckPoint.Template.Exists() {
+				template = fmt.Sprintf("%s (%s)", site.LatestCheckPoint.Template.Name, site.LatestCheckPoint.Template.Hash())
+			}
 			tbl.AddRow(
 				site.Name,
 				string(site.State),
-				site.LatestCheckPoint.Template.Name+" ("+site.LatestCheckPoint.Template.Hash()+")",
+				template,
 			)
 		}
 		tbl.PrintSeparator()

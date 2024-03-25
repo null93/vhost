@@ -20,6 +20,9 @@ var infoCmd = &cobra.Command{
 		if errSite != nil {
 			ExitWithError(2, errSite.Error())
 		}
+		if !site.LatestCheckPoint.Template.Exists() {
+			ExitWithError(3, "site is not managed by vhost")
+		}
 		tbl := utils.NewTable("Key", "Value")
 		tbl.AddRow("state:", string(site.State))
 		tbl.AddRow("template_hash:", site.LatestCheckPoint.Template.Hash())

@@ -16,8 +16,17 @@ var enableCmd = &cobra.Command{
 			ExitWithError(1, "site does not exist")
 		}
 
+		latestCheckPoint, errLatest := vhost.GetLatestCheckPoint(siteName)
+		if errLatest != nil {
+			ExitWithError(2, errLatest.Error())
+		}
+
+		if !latestCheckPoint.Template.Exists() {
+			ExitWithError(3, "site is not managed by vhost")
+		}
+
 		if err := vhost.EnableSite(siteName); err != nil {
-			ExitWithError(2, "failed to enable site")
+			ExitWithError(4, "failed to enable site")
 		}
 	},
 }

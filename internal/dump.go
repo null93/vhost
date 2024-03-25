@@ -35,6 +35,10 @@ var dumpCmd = &cobra.Command{
 			ExitWithError(3, errCheckPoint.Error())
 		}
 
+		if !checkPoint.Template.Exists() {
+			ExitWithError(5, "site is not managed by vhost")
+		}
+
 		buf := new(bytes.Buffer)
 		gzipWriter := gzip.NewWriter(buf)
 		tarWriter := tar.NewWriter(gzipWriter)
@@ -43,41 +47,41 @@ var dumpCmd = &cobra.Command{
 
 		tarFiles, err := checkPoint.GetTarFiles()
 		if err != nil {
-			ExitWithError(4, err.Error())
+			ExitWithError(6, err.Error())
 		}
 
 		for _, tarFile := range tarFiles {
 			if err := tarWriter.WriteHeader(tarFile.Header); err != nil {
 				tarWriter.Close()
 				gzipWriter.Close()
-				ExitWithError(5, err.Error())
+				ExitWithError(7, err.Error())
 			}
 			if _, err := tarWriter.Write(tarFile.Body); err != nil {
 				tarWriter.Close()
 				gzipWriter.Close()
-				ExitWithError(6, err.Error())
+				ExitWithError(8, err.Error())
 			}
 		}
 
 		if err := tarWriter.Close(); err != nil {
 			gzipWriter.Close()
-			ExitWithError(7, err.Error())
+			ExitWithError(9, err.Error())
 		}
 		if err := gzipWriter.Close(); err != nil {
-			ExitWithError(8, err.Error())
+			ExitWithError(10, err.Error())
 		}
 
 		fileName := fmt.Sprintf("%s-%d.tar.gz", siteName, revisionInt)
 		filePath := path.Join(directory, fileName)
 		file, err := os.Create(filePath)
 		if err != nil {
-			ExitWithError(9, err.Error())
+			ExitWithError(11, err.Error())
 		}
 		defer file.Close()
 
 		_, err = buf.WriteTo(file)
 		if err != nil {
-			ExitWithError(10, err.Error())
+			ExitWithError(12, err.Error())
 		}
 
 		fmt.Println(filePath)

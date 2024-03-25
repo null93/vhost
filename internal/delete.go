@@ -19,12 +19,21 @@ var deleteCmd = &cobra.Command{
 			ExitWithError(1, fmt.Sprintf("site %q does not exist", siteName))
 		}
 
+		latestCheckPoint, errLatest := vhost.GetLatestCheckPoint(siteName)
+		if errLatest != nil {
+			ExitWithError(2, errLatest.Error())
+		}
+
+		if !latestCheckPoint.Template.Exists() {
+			ExitWithError(3, "site is not managed by vhost")
+		}
+
 		if errDelete := vhost.DeleteSite(siteName, true); errDelete != nil {
-			ExitWithError(2, errDelete.Error())
+			ExitWithError(4, errDelete.Error())
 		}
 
 		if errPurge := vhost.PurgeCheckPoints(siteName, true); errPurge != nil {
-			ExitWithError(3, errPurge.Error())
+			ExitWithError(5, errPurge.Error())
 		}
 	},
 }

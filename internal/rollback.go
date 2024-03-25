@@ -25,18 +25,22 @@ var rollbackCmd = &cobra.Command{
 			ExitWithError(2, fmt.Sprintf("site %q does not exist", siteName))
 		}
 
-		checkPoint, errCheckPoint := vhost.GetCheckPoint(siteName, revisionInt)
-		if errCheckPoint != nil {
-			ExitWithError(3, errCheckPoint.Error())
-		}
-
 		latestCheckPoint, errLatest := vhost.GetLatestCheckPoint(siteName)
 		if errLatest != nil {
-			ExitWithError(4, errLatest.Error())
+			ExitWithError(3, errLatest.Error())
+		}
+
+		if !latestCheckPoint.Template.Exists() {
+			ExitWithError(4, "site is not managed by vhost")
+		}
+
+		checkPoint, errCheckPoint := vhost.GetCheckPoint(siteName, revisionInt)
+		if errCheckPoint != nil {
+			ExitWithError(5, errCheckPoint.Error())
 		}
 
 		if errDelete := latestCheckPoint.Output.DeleteFiles(true); errDelete != nil {
-			ExitWithError(5, errDelete.Error())
+			ExitWithError(6, errDelete.Error())
 		}
 
 		checkPoint.Revision = latestCheckPoint.Revision + 1
@@ -45,12 +49,12 @@ var rollbackCmd = &cobra.Command{
 
 		errOutputSave := checkPoint.Output.Save()
 		if errOutputSave != nil {
-			ExitWithError(6, errOutputSave.Error())
+			ExitWithError(7, errOutputSave.Error())
 		}
 
 		errSave := checkPoint.Save()
 		if errSave != nil {
-			ExitWithError(7, errSave.Error())
+			ExitWithError(8, errSave.Error())
 		}
 	},
 }

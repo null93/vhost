@@ -167,6 +167,10 @@ func (i TemplateInput) SortedKeys() []string {
 	return keys
 }
 
+func (t Template) Exists() bool {
+	return t.Name != ""
+}
+
 func (t Template) Hash() string {
 	hash := []byte(t.Name)
 	hash = append(hash, t.Provisioner...)
