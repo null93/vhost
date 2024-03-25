@@ -20,7 +20,6 @@ services:
       build:
         condition: service_completed_successfully
     volumes:
-      - ./bin:/usr/local/bin
       - ./dist:/usr/local/dist
     ports:
       - "80:80"

@@ -12,7 +12,8 @@ deps:
 
 build:
 	@echo "Building for your arch..."
-	goreleaser build --snapshot --clean
+	rm -rf ./dist/*
+	goreleaser build --snapshot
 	
 test:
 	@echo "Running tests..."
