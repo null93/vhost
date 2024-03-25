@@ -69,17 +69,17 @@ http://magento-127-0-0-1.nip.io
   ### amd64
   
   ```shell
-  curl -sL -o ./vhost_0.0.2_amd64.deb https://github.com/null93/vhost/releases/download/0.0.2/vhost_0.0.2_amd64.deb
-  sudo dpkg -i ./vhost_0.0.2_amd64.deb
-  rm ./vhost_0.0.2_amd64.deb
+  curl -sL -o ./vhost_0.0.3_amd64.deb https://github.com/null93/vhost/releases/download/0.0.3/vhost_0.0.3_amd64.deb
+  sudo dpkg -i ./vhost_0.0.3_amd64.deb
+  rm ./vhost_0.0.3_amd64.deb
   ```
 
   ### arm64
 
   ```shell
-  curl -sL -o ./vhost_0.0.2_arm64.deb https://github.com/null93/vhost/releases/download/0.0.2/vhost_0.0.2_arm64.deb
-  sudo dpkg -i ./vhost_0.0.2_arm64.deb
-  rm ./vhost_0.0.2_arm64.deb
+  curl -sL -o ./vhost_0.0.3_arm64.deb https://github.com/null93/vhost/releases/download/0.0.3/vhost_0.0.3_arm64.deb
+  sudo dpkg -i ./vhost_0.0.3_arm64.deb
+  rm ./vhost_0.0.3_arm64.deb
   ```
 </details>
 
@@ -89,13 +89,13 @@ http://magento-127-0-0-1.nip.io
   ### aarch64
 
   ```shell
-  rpm -i https://github.com/null93/vhost/releases/download/0.0.2/vhost-0.0.2-1.aarch64.rpm
+  rpm -i https://github.com/null93/vhost/releases/download/0.0.3/vhost-0.0.3-1.aarch64.rpm
   ```
 
   ### x86_64
 
   ```shell
-  rpm -i https://github.com/null93/vhost/releases/download/0.0.2/vhost-0.0.2-1.x86_64.rpm
+  rpm -i https://github.com/null93/vhost/releases/download/0.0.3/vhost-0.0.3-1.x86_64.rpm
   ```
 </details>
 
@@ -105,17 +105,17 @@ http://magento-127-0-0-1.nip.io
   ### aarch64
 
   ```shell
-  curl -sL -o ./vhost_0.0.2_aarch64.apk https://github.com/null93/vhost/releases/download/0.0.2/vhost_0.0.2_aarch64.apk
-  apk add --allow-untrusted ./vhost_0.0.2_aarch64.apk
-  rm ./vhost_0.0.2_aarch64.apk
+  curl -sL -o ./vhost_0.0.3_aarch64.apk https://github.com/null93/vhost/releases/download/0.0.3/vhost_0.0.3_aarch64.apk
+  apk add --allow-untrusted ./vhost_0.0.3_aarch64.apk
+  rm ./vhost_0.0.3_aarch64.apk
   ```
 
   ### x86_64
 
   ```shell
-  curl -sL -o ./vhost_0.0.2_x86_64.apk https://github.com/null93/vhost/releases/download/0.0.2/vhost_0.0.2_x86_64.apk
-  apk add --allow-untrusted ./vhost_0.0.2_x86_64.apk
-  rm ./vhost_0.0.2_x86_64.apk
+  curl -sL -o ./vhost_0.0.3_x86_64.apk https://github.com/null93/vhost/releases/download/0.0.3/vhost_0.0.3_x86_64.apk
+  apk add --allow-untrusted ./vhost_0.0.3_x86_64.apk
+  rm ./vhost_0.0.3_x86_64.apk
   ```
 </details>
 
@@ -125,16 +125,16 @@ http://magento-127-0-0-1.nip.io
   ### aarch64
 
   ```shell
-  curl -sL -o ./vhost-0.0.2-1-aarch64.pkg.tar.zst https://github.com/null93/vhost/releases/download/0.0.2/vhost-0.0.2-1-aarch64.pkg.tar.zst
-  sudo pacman -U ./vhost-0.0.2-1-aarch64.pkg.tar.zst
-  rm ./vhost-0.0.2-1-aarch64.pkg.tar.zst
+  curl -sL -o ./vhost-0.0.3-1-aarch64.pkg.tar.zst https://github.com/null93/vhost/releases/download/0.0.3/vhost-0.0.3-1-aarch64.pkg.tar.zst
+  sudo pacman -U ./vhost-0.0.3-1-aarch64.pkg.tar.zst
+  rm ./vhost-0.0.3-1-aarch64.pkg.tar.zst
   ```
 
   ### x86_64
 
   ```shell
-  curl -sL -o ./vhost-0.0.2-1-x86_64.pkg.tar.zst https://github.com/null93/vhost/releases/download/0.0.2/vhost-0.0.2-1-x86_64.pkg.tar.zst
-  sudo pacman -U ./vhost-0.0.2-1-x86_64.pkg.tar.zst
-  rm ./vhost-0.0.2-1-x86_64.pkg.tar.zst
+  curl -sL -o ./vhost-0.0.3-1-x86_64.pkg.tar.zst https://github.com/null93/vhost/releases/download/0.0.3/vhost-0.0.3-1-x86_64.pkg.tar.zst
+  sudo pacman -U ./vhost-0.0.3-1-x86_64.pkg.tar.zst
+  rm ./vhost-0.0.3-1-x86_64.pkg.tar.zst
   ```
 </details>
