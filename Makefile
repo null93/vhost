@@ -3,7 +3,7 @@
 
 tools:
 	@echo "Installing tools..."
-	command -v goreleaser || go install github.com/goreleaser/goreleaser@latest
+	command -v goreleaser || go install github.com/goreleaser/goreleaser/v2@latest
 	command -v goimports || go install golang.org/x/tools/cmd/goimports@latest
 
 deps:

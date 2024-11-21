@@ -1,5 +1,7 @@
 # Documentation can be found here: https://goreleaser.com
 
+version: 2
+
 before:
   hooks:
     - go mod tidy
@@ -21,7 +23,7 @@ checksum:
   name_template: 'checksums.txt'
 
 snapshot:
-  name_template: "{{ .Version }}"
+  version_template: "{{ .Version }}"
 
 changelog:
   sort: asc
@@ -56,7 +58,7 @@ brews:
   - repository:
       owner: null93
       name: homebrew-tap
-    folder: Formula
+    directory: Formula
     goarm: "7"
     homepage: https://github.com/null93/vhost
     description: NGINX config structure for provisioning virtual hosts with a CLI tool

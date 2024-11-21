@@ -19,8 +19,8 @@ All you need is docker installed with the docker compose plugin.
 On your host machine, run the following commands:
 
 ```
-docker-compose up -d
-docker-compose exec nginx bash
+docker compose up -d
+docker compose exec nginx bash
 ```
 
 Once you are inside the docker container, you can create some virtual hosts:

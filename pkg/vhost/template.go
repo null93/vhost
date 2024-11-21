@@ -256,7 +256,7 @@ func (input TemplateInput) GetEnvironmentalVars() []string {
 	return vars
 }
 
-func (t Template) RunProvisioner(siteName string, input TemplateInput) error {
+func (t Template) RunProvisioner(siteName string, input TemplateInput, becomeUser string) error {
 	validatedInput, errValidate := t.InputSchema.Validate(input)
 	if errValidate != nil {
 		return errValidate
@@ -267,6 +267,10 @@ func (t Template) RunProvisioner(siteName string, input TemplateInput) error {
 		return errMkdir
 	}
 	defer os.RemoveAll(tmpDir)
+	errChmod := os.Chmod(tmpDir, 0777)
+	if errChmod != nil {
+		return errChmod
+	}
 	assetsDir := path.Join(PATH_TEMPLATES_DIR, t.Name, "assets")
 	if _, errStat := os.Stat(assetsDir); errStat == nil {
 		errCopy := cp.Copy(assetsDir, path.Join(tmpDir, "assets"))
@@ -279,7 +283,13 @@ func (t Template) RunProvisioner(siteName string, input TemplateInput) error {
 	if errWrite != nil {
 		return errWrite
 	}
-	cmd := exec.Command(provisionerPath)
+	cmdMain := provisionerPath
+	cmdArgs := []string{}
+	if becomeUser != "" {
+		cmdMain = "sudo"
+		cmdArgs = []string{"-E", "-u", becomeUser, provisionerPath}
+	}
+	cmd := exec.Command(cmdMain, cmdArgs...)
 	cmd.Env = []string{
 		"HOME=" + os.Getenv("HOME"),
 		"PATH=" + os.Getenv("PATH"),

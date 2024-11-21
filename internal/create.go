@@ -16,6 +16,7 @@ var createCmd = &cobra.Command{
 		templateName := args[0]
 		siteName := args[1]
 		templateInput := ParseKeyValueArgs(args[2:])
+		become, _ := cmd.Flags().GetString("become")
 
 		if vhost.SiteExists(siteName) {
 			ExitWithError(1, fmt.Sprintf("site %q already exists", siteName))
@@ -36,7 +37,7 @@ var createCmd = &cobra.Command{
 			ExitWithError(4, errOutputSave.Error())
 		}
 
-		if errProvisioner := checkPoint.Template.RunProvisioner(siteName, templateInput); errProvisioner == nil {
+		if errProvisioner := checkPoint.Template.RunProvisioner(siteName, templateInput, become); errProvisioner == nil {
 			checkPoint.Description = "initial"
 			errSave := checkPoint.Save()
 			if errSave != nil {
@@ -51,4 +52,5 @@ var createCmd = &cobra.Command{
 
 func init() {
 	RootCmd.AddCommand(createCmd)
+	createCmd.Flags().StringP("become", "b", "", "run provisioner as another user")
 }
