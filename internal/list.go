@@ -18,6 +18,9 @@ var listCmd = &cobra.Command{
 			"Status",
 			"Template",
 		)
+		if quiet, _ := cmd.Flags().GetBool("quiet"); quiet {
+			tbl.SetQuietCols("Site Name")
+		}
 		sites, errList := vhost.GetSites()
 		if errList != nil {
 			ExitWithError(1, errList.Error())
@@ -41,4 +44,5 @@ var listCmd = &cobra.Command{
 
 func init() {
 	RootCmd.AddCommand(listCmd)
+	listCmd.Flags().BoolP("quiet", "q", false, "minimal output")
 }

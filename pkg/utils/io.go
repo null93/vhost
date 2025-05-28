@@ -18,9 +18,11 @@ type Row []Column
 type Table struct {
 	headers               []Column
 	rows                  []Row
+	quietColIndices       []int
 	emptyMsg              string
 	separationLength      int
 	printHeadersWhenEmpty bool
+	quiet                 bool
 }
 
 func NewTable(headers ...Column) *Table {
@@ -30,6 +32,8 @@ func NewTable(headers ...Column) *Table {
 		emptyMsg:              DEFAULT_EMPTY_MSG,
 		separationLength:      DEFAULT_SEPARATION_LENGTH,
 		printHeadersWhenEmpty: DEFAULT_PRINT_HEADERS_WHEN_EMPTY,
+		quiet:                 false,
+		quietColIndices:       []int{},
 	}
 }
 
@@ -59,11 +63,31 @@ func (t *Table) GetColumnWidths() []int {
 	return widths
 }
 
+func (t *Table) SetQuietCols(cols ...string) {
+	t.quiet = true
+	for _, col := range cols {
+		for i, header := range t.headers {
+			if string(header) == col {
+				t.quietColIndices = append(t.quietColIndices, i)
+			}
+		}
+	}
+}
+
+func containsInt(slice []int, value int) bool {
+	for _, v := range slice {
+		if v == value {
+			return true
+		}
+	}
+	return false
+}
+
 func (t *Table) Print() {
 	widths := t.GetColumnWidths()
 	format := "%-*s"
 	hasRows := !t.IsEmpty()
-	if hasRows || t.printHeadersWhenEmpty {
+	if !t.quiet && (hasRows || t.printHeadersWhenEmpty) {
 		for i, header := range t.headers {
 			value := strings.ToUpper(string(header))
 			fmt.Printf(format, widths[i]+t.separationLength, value)
@@ -76,17 +100,21 @@ func (t *Table) Print() {
 				if len(col) == 0 {
 					col = "-"
 				}
-				fmt.Printf(format, widths[i]+t.separationLength, col)
+				if !t.quiet || containsInt(t.quietColIndices, i) {
+					fmt.Printf(format, widths[i]+t.separationLength, col)
+				}
 			}
 			fmt.Println()
 		}
-	} else {
+	} else if !t.quiet {
 		fmt.Println(t.emptyMsg)
 	}
 }
 
 func (t *Table) PrintSeparator() {
-	fmt.Println()
+	if !t.quiet {
+		fmt.Println()
+	}
 }
 
 func (t *Table) SetEmptyMsg(msg string) {
