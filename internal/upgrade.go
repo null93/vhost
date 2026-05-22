@@ -35,6 +35,10 @@ var upgradeCmd = &cobra.Command{
 			ExitWithError(3, "site is not managed by vhost")
 		}
 
+		if checkPoint.ManualEdits {
+			ExitWithError(3, "latest checkpoint holds saved manual edits; rollback to a managed checkpoint before upgrading")
+		}
+
 		latestTemplate, errTemplate := vhost.LoadTemplate(checkPoint.Template.Name)
 		if errTemplate != nil {
 			ExitWithError(4, errTemplate.Error())

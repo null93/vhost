@@ -25,6 +25,7 @@ type CheckPoint struct {
 	Input       TemplateInput
 	Output      TemplateOutput
 	Description string
+	ManualEdits bool
 }
 
 type TarFile struct {

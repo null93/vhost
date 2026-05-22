@@ -32,6 +32,10 @@ var modifyCmd = &cobra.Command{
 
 		checkPoint := checkPoints[len(checkPoints)-1]
 
+		if checkPoint.ManualEdits {
+			ExitWithError(3, "latest checkpoint holds saved manual edits; rollback to a managed checkpoint before modifying")
+		}
+
 		checkPoint.Input = MergeInput(checkPoint.Input, templateInput)
 		templateOutput, errRender := checkPoint.Template.Render(siteName, checkPoint.Input)
 		if errRender != nil {

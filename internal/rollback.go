@@ -19,7 +19,12 @@ var rollbackCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		siteName := args[0]
 		revision := args[1]
-		force, _ := cmd.Flags().GetBool("force")
+		discard, _ := cmd.Flags().GetBool("discard")
+		save, _ := cmd.Flags().GetBool("save")
+
+		if discard && save {
+			ExitWithError(1, "--discard and --save are mutually exclusive")
+		}
 
 		revisionInt, errRevision := strconv.Atoi(revision)
 		if errRevision != nil {
@@ -39,19 +44,44 @@ var rollbackCmd = &cobra.Command{
 		}
 
 		deviationsFound := false
+		deviatedFiles := map[string][]byte{}
 		for fileName, fileBytes := range latestCheckPoint.Output {
 			currentPath := path.Join(vhost.PATH_NGINX_DIR, fileName)
 			currentBytes, errRead := ioutil.ReadFile(currentPath)
 			if errRead != nil {
 				currentBytes = []byte{}
 			}
+			deviatedFiles[fileName] = currentBytes
 			if string(currentBytes) != string(fileBytes) {
-				if !force {
-					ExitWithError(15, fmt.Sprintf("there are manual changes that deviate from the template, check 'vhost diff %s' for details", siteName))
-				}
 				deviationsFound = true
-				break
 			}
+		}
+		if deviationsFound && !discard && !save {
+			ExitWithError(15, fmt.Sprintf("there are manual changes that deviate from the template, check 'vhost diff %s' for details; pass --discard to drop them or --save to capture them as a checkpoint", siteName))
+		}
+
+		if save && deviationsFound {
+			frozenTemplate := latestCheckPoint.Template
+			frozenTemplate.Files = map[string][]byte{}
+			snapshotOutput := vhost.TemplateOutput{}
+			for fileName, fileBytes := range deviatedFiles {
+				frozenTemplate.Files[fileName] = fileBytes
+				snapshotOutput[fileName] = fileBytes
+			}
+			snapshot := vhost.CheckPoint{
+				Revision:    latestCheckPoint.Revision + 1,
+				SiteName:    latestCheckPoint.SiteName,
+				Timestamp:   time.Now(),
+				Template:    frozenTemplate,
+				Input:       latestCheckPoint.Input,
+				Output:      snapshotOutput,
+				Description: "deviations saved",
+				ManualEdits: true,
+			}
+			if errSave := snapshot.Save(); errSave != nil {
+				ExitWithError(16, errSave.Error())
+			}
+			latestCheckPoint = snapshot
 		}
 
 		checkPoint, errCheckPoint := vhost.GetCheckPoint(siteName, revisionInt)
@@ -105,7 +135,7 @@ var rollbackCmd = &cobra.Command{
 		} else {
 			checkPoint.Description = fmt.Sprintf("rollback to revision %d", revisionInt)
 		}
-		if deviationsFound {
+		if deviationsFound && discard {
 			checkPoint.Description += " (deviations abandoned)"
 		}
 		checkPoint.Timestamp = time.Now()
@@ -127,5 +157,6 @@ var rollbackCmd = &cobra.Command{
 
 func init() {
 	RootCmd.AddCommand(rollbackCmd)
-	rollbackCmd.Flags().BoolP("force", "f", false, "discard manual changes that deviate from the latest checkpoint")
+	rollbackCmd.Flags().BoolP("discard", "d", false, "discard manual changes that deviate from the latest checkpoint")
+	rollbackCmd.Flags().BoolP("save", "s", false, "save manual changes as a new checkpoint before rolling back")
 }
