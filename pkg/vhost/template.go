@@ -214,11 +214,21 @@ func (i TemplateInput) Yaml() []byte {
 }
 
 func (o TemplateOutput) DeleteFiles(silent bool) error {
+	parents := map[string]struct{}{}
 	for fileName := range o {
 		filePath := path.Join(PATH_NGINX_DIR, fileName)
 		err := os.Remove(filePath)
 		if !silent && err != nil {
 			return err
+		}
+		parents[path.Dir(filePath)] = struct{}{}
+	}
+	for parent := range parents {
+		for parent != PATH_NGINX_DIR && parent != "/" && parent != "." {
+			if err := os.Remove(parent); err != nil {
+				break
+			}
+			parent = path.Dir(parent)
 		}
 	}
 	return nil

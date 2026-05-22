@@ -2,6 +2,8 @@ package internal
 
 import (
 	"fmt"
+	"os"
+	"path"
 	"strconv"
 	"time"
 
@@ -39,22 +41,65 @@ var rollbackCmd = &cobra.Command{
 			ExitWithError(5, errCheckPoint.Error())
 		}
 
+		targetSiteName := checkPoint.SiteName
+		if targetSiteName == "" {
+			targetSiteName = siteName
+		}
+		crossRename := targetSiteName != siteName
+
+		if crossRename && vhost.SiteExists(targetSiteName) {
+			ExitWithError(6, fmt.Sprintf("cannot rollback across rename: site %q already exists", targetSiteName))
+		}
+
+		site, errSite := vhost.GetSite(siteName)
+		if errSite != nil {
+			ExitWithError(7, errSite.Error())
+		}
+		wasEnabled := site.State == vhost.SITE_ENABLED
+
 		if errDelete := latestCheckPoint.Output.DeleteFiles(true); errDelete != nil {
-			ExitWithError(6, errDelete.Error())
+			ExitWithError(8, errDelete.Error())
+		}
+
+		if crossRename {
+			if wasEnabled {
+				if errDisable := vhost.DisableSite(siteName); errDisable != nil {
+					ExitWithError(9, errDisable.Error())
+				}
+			}
+
+			allCheckpoints, errAll := vhost.GetCheckPoints(siteName)
+			if errAll != nil {
+				ExitWithError(10, errAll.Error())
+			}
+			for _, cp := range allCheckpoints {
+				oldPath := path.Join(vhost.PATH_CHECKPOINTS_DIR, fmt.Sprintf("%s_%d.state", siteName, cp.Revision))
+				newPath := path.Join(vhost.PATH_CHECKPOINTS_DIR, fmt.Sprintf("%s_%d.state", targetSiteName, cp.Revision))
+				if errRename := os.Rename(oldPath, newPath); errRename != nil {
+					ExitWithError(11, errRename.Error())
+				}
+			}
 		}
 
 		checkPoint.Revision = latestCheckPoint.Revision + 1
-		checkPoint.Description = fmt.Sprintf("rollback to revision %d", revisionInt)
+		if crossRename {
+			checkPoint.Description = fmt.Sprintf("rollback to revision %d (renamed from %q to %q)", revisionInt, siteName, targetSiteName)
+		} else {
+			checkPoint.Description = fmt.Sprintf("rollback to revision %d", revisionInt)
+		}
 		checkPoint.Timestamp = time.Now()
 
-		errOutputSave := checkPoint.Output.Save()
-		if errOutputSave != nil {
-			ExitWithError(7, errOutputSave.Error())
+		if errOutputSave := checkPoint.Output.Save(); errOutputSave != nil {
+			ExitWithError(12, errOutputSave.Error())
+		}
+		if errSave := checkPoint.Save(); errSave != nil {
+			ExitWithError(13, errSave.Error())
 		}
 
-		errSave := checkPoint.Save()
-		if errSave != nil {
-			ExitWithError(8, errSave.Error())
+		if crossRename && wasEnabled {
+			if errEnable := vhost.EnableSite(targetSiteName); errEnable != nil {
+				ExitWithError(14, errEnable.Error())
+			}
 		}
 	},
 }
