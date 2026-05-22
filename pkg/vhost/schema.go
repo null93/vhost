@@ -86,6 +86,14 @@ func (schema InputSchema) SortedKeys() []string {
 }
 
 func (schema InputSchema) Validate(input TemplateInput) (TemplateInput, error) {
+	for key := range input {
+		if key == "site_name" {
+			continue
+		}
+		if _, ok := schema[key]; !ok {
+			return TemplateInput{}, fmt.Errorf("unknown input %q", key)
+		}
+	}
 	validated := TemplateInput{}
 	for key, definition := range schema {
 		pattern := definition.CustomPattern

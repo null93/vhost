@@ -61,6 +61,30 @@ func TestParsing(t *testing.T) {
 	}
 }
 
+func TestValidateRejectsUnknownInput(t *testing.T) {
+	schema, errParse := ParseInputSchema([]byte(`
+        domain_names:
+          pattern: domain
+          value: example.com
+    `))
+	if errParse != nil {
+		t.Fatal(errParse)
+	}
+	// Typo / mismatched key — schema has domain_names, not domain.
+	_, err := schema.Validate(TemplateInput{"domain": "foo.example.com"})
+	if err == nil {
+		t.Fatal("expected unknown-input error, got nil")
+	}
+	if want := `unknown input "domain"`; err.Error() != want {
+		t.Errorf("error = %q, want %q", err.Error(), want)
+	}
+
+	// site_name is reserved (set by Render) and must always be accepted.
+	if _, err := schema.Validate(TemplateInput{"site_name": "anything", "domain_names": "ok.example.com"}); err != nil {
+		t.Errorf("site_name should be exempt from the unknown-input check, got: %v", err)
+	}
+}
+
 func TestValidation(t *testing.T) {
 	errMissingPattern := ValidateDefinition(Definition{})
 	if errMissingPattern != ErrMissingPattern {
