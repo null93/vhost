@@ -2,6 +2,7 @@ package internal
 
 import (
 	"fmt"
+	"io/ioutil"
 	"os"
 	"path"
 	"strconv"
@@ -18,6 +19,7 @@ var rollbackCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		siteName := args[0]
 		revision := args[1]
+		force, _ := cmd.Flags().GetBool("force")
 
 		revisionInt, errRevision := strconv.Atoi(revision)
 		if errRevision != nil {
@@ -34,6 +36,22 @@ var rollbackCmd = &cobra.Command{
 
 		if !latestCheckPoint.Template.Exists() {
 			ExitWithError(4, "site is not managed by vhost")
+		}
+
+		deviationsFound := false
+		for fileName, fileBytes := range latestCheckPoint.Output {
+			currentPath := path.Join(vhost.PATH_NGINX_DIR, fileName)
+			currentBytes, errRead := ioutil.ReadFile(currentPath)
+			if errRead != nil {
+				currentBytes = []byte{}
+			}
+			if string(currentBytes) != string(fileBytes) {
+				if !force {
+					ExitWithError(15, fmt.Sprintf("there are manual changes that deviate from the template, check 'vhost diff %s' for details", siteName))
+				}
+				deviationsFound = true
+				break
+			}
 		}
 
 		checkPoint, errCheckPoint := vhost.GetCheckPoint(siteName, revisionInt)
@@ -87,6 +105,9 @@ var rollbackCmd = &cobra.Command{
 		} else {
 			checkPoint.Description = fmt.Sprintf("rollback to revision %d", revisionInt)
 		}
+		if deviationsFound {
+			checkPoint.Description += " (deviations abandoned)"
+		}
 		checkPoint.Timestamp = time.Now()
 
 		if errOutputSave := checkPoint.Output.Save(); errOutputSave != nil {
@@ -106,4 +127,5 @@ var rollbackCmd = &cobra.Command{
 
 func init() {
 	RootCmd.AddCommand(rollbackCmd)
+	rollbackCmd.Flags().BoolP("force", "f", false, "discard manual changes that deviate from the latest checkpoint")
 }
