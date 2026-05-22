@@ -403,6 +403,58 @@ func TestDeleteFilesRemovesEmptyParents(t *testing.T) {
 	}
 }
 
+// NewCheckPointWithoutProvisioner skips validation for provisioner_only
+// inputs so users don't have to supply provisioner-only KEY=VALUE pairs that
+// have no effect on the rendered files (those inputs are only consumed by
+// provisioner.sh, which won't run on this path).
+func TestNewCheckPointWithoutProvisionerSkipsProvisionerOnlyValidation(t *testing.T) {
+	setupTempVhost(t)
+	tplDir := filepath.Join(PATH_TEMPLATES_DIR, "magentolike")
+	files := map[string][]byte{
+		"schema.yaml": []byte(`domain:
+  pattern: domain
+  description: domain name
+  value: example.com
+magento_version:
+  pattern: version
+  description: version (provisioner-only, no default)
+  provisioner_only: true
+`),
+		"provisioner.sh":                       []byte("#!/bin/sh\nexit 0\n"),
+		"sites-available/[site_name].conf.tpl": []byte("server { server_name {{ .domain }}; }\n"),
+	}
+	for rel, body := range files {
+		full := filepath.Join(tplDir, rel)
+		if err := os.MkdirAll(filepath.Dir(full), 0755); err != nil {
+			t.Fatal(err)
+		}
+		if err := os.WriteFile(full, body, 0644); err != nil {
+			t.Fatal(err)
+		}
+	}
+	tpl, err := LoadTemplate("magentolike")
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	// Sanity: the normal path must reject because magento_version has no value
+	// and its default is empty (doesn't match the version pattern).
+	if _, err := NewCheckPoint("alpha", tpl, TemplateInput{"domain": "alpha.example.com"}); err == nil {
+		t.Fatal("NewCheckPoint should fail when provisioner_only inputs lack a valid default")
+	}
+
+	cp, err := NewCheckPointWithoutProvisioner("alpha", tpl, TemplateInput{"domain": "alpha.example.com"})
+	if err != nil {
+		t.Fatalf("NewCheckPointWithoutProvisioner unexpected error: %v", err)
+	}
+	if _, ok := cp.Input["magento_version"]; ok {
+		t.Errorf("provisioner_only input should not be stored on checkpoint, got Input=%v", cp.Input)
+	}
+	if _, ok := cp.Output["sites-available/alpha.conf"]; !ok {
+		t.Errorf("expected rendered output to contain site conf, got keys=%v", cp.Output.SortedKeys())
+	}
+}
+
 func contains(haystack, needle string) bool {
 	for i := 0; i+len(needle) <= len(haystack); i++ {
 		if haystack[i:i+len(needle)] == needle {

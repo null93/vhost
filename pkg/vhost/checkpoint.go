@@ -69,7 +69,25 @@ func GetCheckPoint(name string, revision int) (CheckPoint, error) {
 }
 
 func NewCheckPoint(siteName string, template Template, rawInput TemplateInput) (CheckPoint, error) {
-	input, err := template.InputSchema.Validate(rawInput)
+	return newCheckPoint(siteName, template, rawInput, false)
+}
+
+func NewCheckPointWithoutProvisioner(siteName string, template Template, rawInput TemplateInput) (CheckPoint, error) {
+	return newCheckPoint(siteName, template, rawInput, true)
+}
+
+func newCheckPoint(siteName string, template Template, rawInput TemplateInput, skipProvisionerOnly bool) (CheckPoint, error) {
+	schema := template.InputSchema
+	if skipProvisionerOnly {
+		filtered := InputSchema{}
+		for k, def := range schema {
+			if !def.ProvisionerOnly {
+				filtered[k] = def
+			}
+		}
+		schema = filtered
+	}
+	input, err := schema.Validate(rawInput)
 	if err != nil {
 		return CheckPoint{}, err
 	}
@@ -77,8 +95,8 @@ func NewCheckPoint(siteName string, template Template, rawInput TemplateInput) (
 	if err != nil {
 		return CheckPoint{}, err
 	}
-	for key, schema := range template.InputSchema {
-		if schema.ProvisionerOnly {
+	for key, def := range template.InputSchema {
+		if def.ProvisionerOnly {
 			delete(input, key)
 		}
 	}
